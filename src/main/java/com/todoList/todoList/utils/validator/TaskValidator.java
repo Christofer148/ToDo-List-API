@@ -9,7 +9,7 @@ import com.todoList.todoList.models.RequestTask;
 import com.todoList.todoList.utils.exceptions.ApiUnprocessableEntity;
 
 @Component
-public class TaskValidatorImplement implements TaskValidator{
+public class TaskValidator implements TaskValidable{
 
 	@Override
 	public void validate(RequestTask task) throws ApiUnprocessableEntity {

@@ -12,14 +12,17 @@ import com.todoList.todoList.models.RequestTask;
 import com.todoList.todoList.models.Task;
 import com.todoList.todoList.repositories.TaskRepository;
 import com.todoList.todoList.utils.exceptions.ApiNotFound;
-import com.todoList.todoList.utils.validator.TaskValidatorImplement;
+import com.todoList.todoList.utils.validator.IdValidator;
+import com.todoList.todoList.utils.validator.TaskValidator;
 
 @Service
 public class TaskService {
 	@Autowired
 	private TaskRepository taskRepository;
 	@Autowired
-	private TaskValidatorImplement taskValidator;
+	private TaskValidator taskValidator;
+	@Autowired
+	private IdValidator idValidator;
 
 	public Task createNewTask(RequestTask requestTask) {
 		taskValidator.validate(requestTask);
@@ -28,16 +31,19 @@ public class TaskService {
 		task.setDescription(requestTask.description());
 		task.setDeadLine(requestTask.deadLine());
 		task.setCompleted(false);
+		task.setDeleted(false);
 		task.setCreated(Date.valueOf(LocalDate.now()));
 		return taskRepository.save(task);
 	}
 	
 	public Page<Task> getAllTask(Pageable pagination){
-		return taskRepository.findAll(pagination);
+		return taskRepository.findByDeletedIsFalse(pagination);
 	}
 	
-	public Task findById(Long id) {
+	public Task findById(String idToValidate) {
+		Long id = idValidator.validate(idToValidate);
 		Task task = taskRepository.findById(id).orElseThrow(()-> new ApiNotFound("Item not found"));
+		if(task.getDeleted()) new ApiNotFound("Item not found");
 		return task;
 	}
 	
@@ -49,11 +55,21 @@ public class TaskService {
 		return taskRepository.findByCompletedIsFalse(pagination);
 	}
 	
-	public void deleteTask(Task task) {
-		taskRepository.delete(task);
+	public Boolean deleteTaskById(Long id) {
+		Task task = taskRepository.findById(id).orElseThrow(()-> new ApiNotFound("Item not found"));
+		task.setDeleted(true);
+		taskRepository.save(task);
+		return true;
 	}
 	
-	public Task updateTask(Task task) {
+	public Task updateTask(RequestTask requestTask) {
+		Task task = taskRepository.findById(requestTask.id()).orElseThrow(()-> new ApiNotFound("Item not found"));
+		task.setTitle(requestTask.title());
+		task.setDescription(requestTask.description());
+		task.setDeadLine(requestTask.deadLine());
+		task.setCompleted(requestTask.completed());
+		task.setLastModification(Date.valueOf(LocalDate.now()));
+		taskValidator.validate(requestTask);
 		return taskRepository.save(task);
 	}
 }

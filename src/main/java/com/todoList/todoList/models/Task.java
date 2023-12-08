@@ -24,6 +24,8 @@ public class Task {
 	
 	private Boolean completed;
 	
+	private Boolean deleted;
+
 	@Temporal(TemporalType.DATE)
 	private Date deadLine;
 	
@@ -93,5 +95,13 @@ public class Task {
 
 	public void setLastModification(Date lastModification) {
 		this.lastModification = lastModification;
+	}
+	
+	public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
 	}
 }
