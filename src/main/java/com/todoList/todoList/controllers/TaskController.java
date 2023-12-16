@@ -28,7 +28,7 @@ import com.todoList.todoList.models.Task;
 import com.todoList.todoList.services.TaskService;
 import com.todoList.todoList.utils.exceptions.ApiUnprocessableEntity;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
